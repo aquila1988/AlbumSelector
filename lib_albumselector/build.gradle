@@ -34,3 +34,5 @@ dependencies {
 
     implementation 'com.github.bumptech.glide:glide:4.8.0'
 }
+
+apply from:'jcenter-upload.gradle'
