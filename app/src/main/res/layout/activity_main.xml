@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="50dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="15dp">
+
+            <Button
+                android:id="@+id/main_single_mode_Button"
+                android:layout_width="wrap_content"
+                android:layout_height="45dp"
+                android:text="单选模式" />
+
+            <Button
+                android:id="@+id/main_multiple_mode_Button"
+                android:layout_width="wrap_content"
+                android:layout_height="45dp"
+                android:layout_marginLeft="20dp"
+                android:layout_toRightOf="@id/main_single_mode_Button"
+                android:text="多选模式" />
+
+            <TextView
+                android:id="@+id/main_max_select_title_TextView"
+                android:layout_width="wrap_content"
+                android:layout_height="45dp"
+                android:layout_marginLeft="10dp"
+                android:layout_toRightOf="@id/main_multiple_mode_Button"
+                android:gravity="center"
+                android:text="最多选择："
+                android:textColor="#333"
+                android:textSize="16dp"
+
+
+                />
+
+            <EditText
+                android:id="@+id/main_max_count_EditText"
+                android:layout_width="wrap_content"
+                android:layout_height="45dp"
+                android:layout_alignBottom="@id/main_multiple_mode_Button"
+                android:layout_toRightOf="@id/main_max_select_title_TextView"
+                android:gravity="center"
+                android:inputType="number"
+                android:minWidth="40dp"
+                android:singleLine="true"
+                android:text="9" />
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="选择类型:"
+                android:textColor="#333"
+                android:textSize="18dp"
+                android:textStyle="bold" />
+
+            <RadioGroup
+                android:id="@+id/main_select_type_RadioGroup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="15dp"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/main_type_picture_and_video_RadioButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:checked="true"
+                    android:text="图片和视频"
+                    android:textSize="16dp" />
+
+                <RadioButton
+                    android:id="@+id/main_type_picture_RadioButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="图片"
+                    android:textSize="16dp" />
+
+                <RadioButton
+                    android:id="@+id/main_type_video_RadioButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="视频"
+                    android:textSize="16dp"
+
+                    />
+
+            </RadioGroup>
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/main_select_result_TextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="10dp"
+            android:text="选择结果:"
+            android:textColor="#333"
+            android:textSize="16dp" />
+
+        <ImageView
+            android:id="@+id/main_single_select_result_ImageView"
+            android:layout_width="match_parent"
+            android:layout_height="500dp"
+            android:layout_margin="10dp"
+            android:background="#3333"
+            android:scaleType="fitCenter"
+
+            android:visibility="gone" />
+
+        <com.aquila.lib.app.ExpandGridView
+            android:id="@+id/main_multiple_select_result_GridView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/color_0000"
+            android:cacheColorHint="@color/color_0000"
+            android:columnWidth="90dp"
+            android:horizontalSpacing="4dp"
+            android:listSelector="@color/color_0000"
+            android:numColumns="auto_fit"
+            android:padding="10dp"
+            android:verticalSpacing="4dp"
+            android:visibility="gone"
+            tools:listitem="@layout/holder_album_image_layout" />
+
+
+    </LinearLayout>
+</ScrollView>
+
+

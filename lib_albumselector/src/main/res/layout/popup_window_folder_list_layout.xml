@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    <View
+        android:id="@+id/popup_window_mask_View"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#9000"
+        />
+
+    <com.aquila.lib.album.widget.CustomRecyclerView
+        android:id="@+id/popup_window_data_RecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#fff"
+        app:app_recycler_view_max_height="450dp"
+        app:app_item_decoration_type="ITEM_DIVIDE_LNE"
+        app:app_item_divide_line_color="#ddd"
+        app:app_item_divide_line_size="0.8dp"
+        app:app_layout_style="list_vertical"
+        android:layout_alignParentBottom="true"
+        tools:listitem="@layout/holder_album_folder_info_layout"
+        />
+</RelativeLayout>

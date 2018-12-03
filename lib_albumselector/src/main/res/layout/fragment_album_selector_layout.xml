@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="#000">
+
+
+
+    <com.aquila.lib.album.widget.CustomRecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:app_layout_style="grid_vertical"
+        app:app_span_count="4"
+        app:app_item_decoration_type="ITEM_SPACE"
+        app:app_item_margin="5dp"
+        />
+
+
+
+</RelativeLayout>
