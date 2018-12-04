@@ -1,9 +1,11 @@
 package com.aquila.lib.album;
 
+import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.IntDef;
 
+import com.aquila.lib.album.interfaces.OnAlbumSelectCallback;
 import com.aquila.lib.album.utils.AlbumTypeDefine;
 
 /***
@@ -11,16 +13,29 @@ import com.aquila.lib.album.utils.AlbumTypeDefine;
  * @author 作者: W.YuLong
  * @description
  */
-public class AlbumSelectOption implements Parcelable{
+public class AlbumSelectOption implements Parcelable {
 
     private boolean isMultipleSelectMode = false;
     private int max = 9;
     private String title;
+    private Context context;
+    private OnAlbumSelectCallback onAlbumSelectCallback;
+
+
+
+    public void doAlbumSelect() {
+        AlbumSelectorActivity.startAlbumSelectActivity(context, this, onAlbumSelectCallback);
+    }
 
     private @AlbumSelectType int selectType = AlbumTypeDefine.TYPE_PICTURE_AND_VIDEO;
 
-    @IntDef({AlbumTypeDefine.TYPE_PICTURE_AND_VIDEO, AlbumTypeDefine.TYPE_PICTURE,AlbumTypeDefine.TYPE_VIDEO})
+    @IntDef({AlbumTypeDefine.TYPE_PICTURE_AND_VIDEO, AlbumTypeDefine.TYPE_PICTURE, AlbumTypeDefine.TYPE_VIDEO})
     public @interface AlbumSelectType {
+    }
+
+    public AlbumSelectOption setOnAlbumSelectCallback(OnAlbumSelectCallback onAlbumSelectCallback) {
+        this.onAlbumSelectCallback = onAlbumSelectCallback;
+        return this;
     }
 
     public String getTitle() {
@@ -32,8 +47,8 @@ public class AlbumSelectOption implements Parcelable{
         return this;
     }
 
-    public static AlbumSelectOption get() {
-        return new AlbumSelectOption();
+    public static AlbumSelectOption with(Context context) {
+        return new AlbumSelectOption(context);
     }
 
     public boolean isMultipleSelectMode() {
@@ -63,7 +78,8 @@ public class AlbumSelectOption implements Parcelable{
         return this;
     }
 
-    public AlbumSelectOption() {
+    public AlbumSelectOption(Context context) {
+        this.context = context;
     }
 
     @Override

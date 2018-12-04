@@ -1,7 +1,7 @@
 package com.aquila.lib.album;
 
 import android.Manifest;
-import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -57,13 +57,13 @@ public class AlbumSelectorActivity extends AppCompatActivity implements View.OnC
     private long lastClickTime;
 
     /*静态的进入方法*/
-    public static void startAlbumSelectActivity(Activity activity, AlbumSelectOption option, OnAlbumSelectCallback callback) {
+    public static void startAlbumSelectActivity(Context context, AlbumSelectOption option, OnAlbumSelectCallback callback) {
         String key = System.currentTimeMillis() + "";
 
-        Intent intent = new Intent(activity, AlbumSelectorActivity.class);
+        Intent intent = new Intent(context, AlbumSelectorActivity.class);
         intent.putExtra("AlbumSelectOption", option);
         intent.putExtra("key", key);
-        activity.startActivity(intent);
+        context.startActivity(intent);
 
         listenersMap.put(key, callback);
     }

@@ -12,8 +12,7 @@ import android.widget.TextView;
 import com.aquila.lib.album.AlbumFileEntity;
 import com.aquila.lib.album.AlbumGridAdapter;
 import com.aquila.lib.album.AlbumSelectOption;
-import com.aquila.lib.album.AlbumSelectorActivity;
-import com.aquila.lib.album.interfaces.OnAlbumSelectCallback;
+import com.aquila.lib.album.OnAlbumSelectCallbackImpl;
 import com.aquila.lib.album.utils.AlbumTypeDefine;
 import com.aquila.lib.album.utils.ImageLoadUtil;
 
@@ -82,47 +81,67 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(final View v) {
         if (v == singleButton) {
-            AlbumSelectOption option = AlbumSelectOption.get()
-                    .setTitle("单选模式")
-                    .setSelectType(selectType).setMultipleSelectMode(false);
-            AlbumSelectorActivity.startAlbumSelectActivity(this, option, new OnAlbumSelectCallback() {
-                @Override
-                public void onSingleSelect(AlbumFileEntity albumFileEntity) {
-                    singleResultImageView.setVisibility(View.VISIBLE);
-                    gridView.setVisibility(View.GONE);
-                    ImageLoadUtil.loadImage(singleResultImageView, albumFileEntity.getPath());
-                    resultTitleTextView.setText("选择的图片路径为:" + albumFileEntity.getPath());
-                }
+            AlbumSelectOption.with(this)
+                    .setTitle("单选模式").setSelectType(selectType).setMultipleSelectMode(false)
+                    .setOnAlbumSelectCallback(new OnAlbumSelectCallbackImpl(){
+                        @Override
+                        public void onSingleSelect(AlbumFileEntity albumFileEntity) {
+                            singleResultImageView.setVisibility(View.VISIBLE);
+                            gridView.setVisibility(View.GONE);
+                            ImageLoadUtil.loadImage(singleResultImageView, albumFileEntity.getPath());
+                            resultTitleTextView.setText("选择的图片路径为:" + albumFileEntity.getPath());
+                        }
+                    })
+            .doAlbumSelect();
 
-                @Override
-                public void onMultipleSelect(List<AlbumFileEntity> selectList) {
-                }
-            });
+//            AlbumSelectorActivity.startAlbumSelectActivity(this, option, new OnAlbumSelectCallback() {
+//                @Override
+//                public void onSingleSelect(AlbumFileEntity albumFileEntity) {
+//                    singleResultImageView.setVisibility(View.VISIBLE);
+//                    gridView.setVisibility(View.GONE);
+//                    ImageLoadUtil.loadImage(singleResultImageView, albumFileEntity.getPath());
+//                    resultTitleTextView.setText("选择的图片路径为:" + albumFileEntity.getPath());
+//                }
+//
+//                @Override
+//                public void onMultipleSelect(List<AlbumFileEntity> selectList) {
+//                }
+//            });
 
         } else if (v == multipleButton) {
             int max = 9;
             if (maxEditText.getText().length() > 0) {
                 max = Integer.parseInt(maxEditText.getText().toString());
             }
-            AlbumSelectOption option = AlbumSelectOption.get()
+            AlbumSelectOption.with(this)
                     .setMax(max).setTitle("多选模式")
-                    .setSelectType(selectType).setMultipleSelectMode(true);
+                    .setSelectType(selectType).setMultipleSelectMode(true)
+                    .setOnAlbumSelectCallback(new OnAlbumSelectCallbackImpl(){
+                        @Override
+                        public void onMultipleSelect(List<AlbumFileEntity> selectList) {
+                            singleResultImageView.setVisibility(View.GONE);
+                            gridView.setVisibility(View.VISIBLE);
 
-            AlbumSelectorActivity.startAlbumSelectActivity(this, option, new OnAlbumSelectCallback() {
-                @Override
-                public void onSingleSelect(AlbumFileEntity albumFileEntity) {
+                            resultTitleTextView.setText("多选的结果为:" + formatPath(selectList));
+                            gridAdapter.setDataList(selectList);
+                        }
+                    }).doAlbumSelect();;
 
-                }
-
-                @Override
-                public void onMultipleSelect(List<AlbumFileEntity> selectList) {
-                    singleResultImageView.setVisibility(View.GONE);
-                    gridView.setVisibility(View.VISIBLE);
-
-                    resultTitleTextView.setText("多选的结果为:" + formatPath(selectList));
-                    gridAdapter.setDataList(selectList);
-                }
-            });
+//            AlbumSelectorActivity.startAlbumSelectActivity(this, option, new OnAlbumSelectCallback() {
+//                @Override
+//                public void onSingleSelect(AlbumFileEntity albumFileEntity) {
+//
+//                }
+//
+//                @Override
+//                public void onMultipleSelect(List<AlbumFileEntity> selectList) {
+//                    singleResultImageView.setVisibility(View.GONE);
+//                    gridView.setVisibility(View.VISIBLE);
+//
+//                    resultTitleTextView.setText("多选的结果为:" + formatPath(selectList));
+//                    gridAdapter.setDataList(selectList);
+//                }
+//            });
         }
     }
 
