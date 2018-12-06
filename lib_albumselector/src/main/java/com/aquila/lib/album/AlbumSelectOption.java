@@ -14,29 +14,75 @@ import com.aquila.lib.album.utils.AlbumTypeDefine;
  * @description
  */
 public class AlbumSelectOption implements Parcelable {
-
-    private boolean isMultipleSelectMode = false;
-    private int max = 9;
-    private String title;
-    private Context context;
-    private OnAlbumSelectCallback onAlbumSelectCallback;
-
-
-
-    public void doAlbumSelect() {
-        AlbumSelectorActivity.startAlbumSelectActivity(context, this, onAlbumSelectCallback);
-    }
-
-    private @AlbumSelectType int selectType = AlbumTypeDefine.TYPE_PICTURE_AND_VIDEO;
-
     @IntDef({AlbumTypeDefine.TYPE_PICTURE_AND_VIDEO, AlbumTypeDefine.TYPE_PICTURE, AlbumTypeDefine.TYPE_VIDEO})
     public @interface AlbumSelectType {
     }
 
-    public AlbumSelectOption setOnAlbumSelectCallback(OnAlbumSelectCallback onAlbumSelectCallback) {
-        this.onAlbumSelectCallback = onAlbumSelectCallback;
+    private Context context;
+    private boolean isMultipleSelectMode = false;
+    private int max = 9;
+    private String title;
+    private ImageCropOption imageCropOption ;
+
+
+    @AlbumSelectType
+    private int selectType = AlbumTypeDefine.TYPE_PICTURE_AND_VIDEO;
+
+
+    //是否支持裁剪
+    private boolean isCrop = false;
+
+    /***********************************************************************************************************************/
+    public AlbumSelectOption() {
+    }
+
+    public static AlbumSelectOption with() {
+        return new AlbumSelectOption();
+    }
+
+    public void setContext(Context context) {
+        this.context = context;
+    }
+
+
+    public AlbumSelectOption(Context context) {
+        this.context = context;
+    }
+
+    public static AlbumSelectOption with(Context context) {
+        return new AlbumSelectOption(context);
+    }
+
+    public void doAlbumSelect(OnAlbumSelectCallback callback) {
+        AlbumSelectorActivity.startAlbumSelectActivity(context, this, callback);
+    }
+
+
+    /***********************************************************************************************************************/
+
+
+    public ImageCropOption getImageCropOption() {
+        return imageCropOption;
+    }
+
+    public AlbumSelectOption setImageCropOption(ImageCropOption imageCropOption) {
+        this.imageCropOption = imageCropOption;
         return this;
     }
+
+    public boolean isCrop() {
+        return isCrop;
+    }
+
+    public AlbumSelectOption setCrop(boolean crop) {
+        isCrop = crop;
+        //如果未设置裁剪的配置，就生成一个默认的
+        if (imageCropOption == null){
+            imageCropOption = ImageCropOption.get();
+        }
+        return this;
+    }
+
 
     public String getTitle() {
         return title;
@@ -47,9 +93,6 @@ public class AlbumSelectOption implements Parcelable {
         return this;
     }
 
-    public static AlbumSelectOption with(Context context) {
-        return new AlbumSelectOption(context);
-    }
 
     public boolean isMultipleSelectMode() {
         return isMultipleSelectMode;
@@ -78,10 +121,6 @@ public class AlbumSelectOption implements Parcelable {
         return this;
     }
 
-    public AlbumSelectOption(Context context) {
-        this.context = context;
-    }
-
     @Override
     public int describeContents() {
         return 0;
@@ -92,14 +131,18 @@ public class AlbumSelectOption implements Parcelable {
         dest.writeByte(this.isMultipleSelectMode ? (byte) 1 : (byte) 0);
         dest.writeInt(this.max);
         dest.writeString(this.title);
+        dest.writeParcelable(this.imageCropOption, flags);
         dest.writeInt(this.selectType);
+        dest.writeByte(this.isCrop ? (byte) 1 : (byte) 0);
     }
 
     protected AlbumSelectOption(Parcel in) {
         this.isMultipleSelectMode = in.readByte() != 0;
         this.max = in.readInt();
         this.title = in.readString();
+        this.imageCropOption = in.readParcelable(ImageCropOption.class.getClassLoader());
         this.selectType = in.readInt();
+        this.isCrop = in.readByte() != 0;
     }
 
     public static final Creator<AlbumSelectOption> CREATOR = new Creator<AlbumSelectOption>() {

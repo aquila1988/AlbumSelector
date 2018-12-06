@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RadioGroup;
@@ -25,6 +26,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private TextView resultTitleTextView;
     private ImageView singleResultImageView;
     private ExpandGridView gridView;
+    private CheckBox cropCheckBox;
 
     private RadioGroup typeRadioGroup;
 
@@ -76,6 +78,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         singleResultImageView = findViewById(R.id.main_single_select_result_ImageView);
         gridView = findViewById(R.id.main_multiple_select_result_GridView);
         resultTitleTextView = findViewById(R.id.main_select_result_TextView);
+        cropCheckBox = findViewById(R.id.main_crop_CheckBox);
     }
 
     @Override
@@ -83,7 +86,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (v == singleButton) {
             AlbumSelectOption.with(this)
                     .setTitle("单选模式").setSelectType(selectType).setMultipleSelectMode(false)
-                    .setOnAlbumSelectCallback(new OnAlbumSelectCallbackImpl(){
+                    .setCrop(cropCheckBox.isChecked())
+                    .doAlbumSelect(new OnAlbumSelectCallbackImpl(){
                         @Override
                         public void onSingleSelect(AlbumFileEntity albumFileEntity) {
                             singleResultImageView.setVisibility(View.VISIBLE);
@@ -91,22 +95,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             ImageLoadUtil.loadImage(singleResultImageView, albumFileEntity.getPath());
                             resultTitleTextView.setText("选择的图片路径为:" + albumFileEntity.getPath());
                         }
-                    })
-            .doAlbumSelect();
-
-//            AlbumSelectorActivity.startAlbumSelectActivity(this, option, new OnAlbumSelectCallback() {
-//                @Override
-//                public void onSingleSelect(AlbumFileEntity albumFileEntity) {
-//                    singleResultImageView.setVisibility(View.VISIBLE);
-//                    gridView.setVisibility(View.GONE);
-//                    ImageLoadUtil.loadImage(singleResultImageView, albumFileEntity.getPath());
-//                    resultTitleTextView.setText("选择的图片路径为:" + albumFileEntity.getPath());
-//                }
-//
-//                @Override
-//                public void onMultipleSelect(List<AlbumFileEntity> selectList) {
-//                }
-//            });
+                    });
 
         } else if (v == multipleButton) {
             int max = 9;
@@ -116,7 +105,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             AlbumSelectOption.with(this)
                     .setMax(max).setTitle("多选模式")
                     .setSelectType(selectType).setMultipleSelectMode(true)
-                    .setOnAlbumSelectCallback(new OnAlbumSelectCallbackImpl(){
+                    .doAlbumSelect(new OnAlbumSelectCallbackImpl(){
                         @Override
                         public void onMultipleSelect(List<AlbumFileEntity> selectList) {
                             singleResultImageView.setVisibility(View.GONE);
@@ -125,23 +114,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             resultTitleTextView.setText("多选的结果为:" + formatPath(selectList));
                             gridAdapter.setDataList(selectList);
                         }
-                    }).doAlbumSelect();;
-
-//            AlbumSelectorActivity.startAlbumSelectActivity(this, option, new OnAlbumSelectCallback() {
-//                @Override
-//                public void onSingleSelect(AlbumFileEntity albumFileEntity) {
-//
-//                }
-//
-//                @Override
-//                public void onMultipleSelect(List<AlbumFileEntity> selectList) {
-//                    singleResultImageView.setVisibility(View.GONE);
-//                    gridView.setVisibility(View.VISIBLE);
-//
-//                    resultTitleTextView.setText("多选的结果为:" + formatPath(selectList));
-//                    gridAdapter.setDataList(selectList);
-//                }
-//            });
+                    });
         }
     }
 

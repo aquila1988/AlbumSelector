@@ -1,9 +1,23 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.aquila.lib.album">
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application>
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true"
+            tools:replace="name,authorities,exported,grantUriPermissions"
+            >
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/files_path"
+                tools:replace="name,resource" />
+        </provider>
 
         <activity android:name=".AlbumSelectorActivity"
             android:theme="@style/albumTheme"

@@ -3,8 +3,12 @@ package com.aquila.lib.album;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.annotation.Nullable;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.Gravity;
@@ -24,6 +28,8 @@ import com.aquila.lib.album.interfaces.OnSingleItemSelectCallback;
 import com.aquila.lib.album.utils.PermissionsUtil;
 import com.aquila.lib.album.utils.SPSingleton;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -35,6 +41,8 @@ import java.util.Map;
  * @description 相册选择的页面
  */
 public class AlbumSelectorActivity extends AppCompatActivity implements View.OnClickListener {
+
+    private static final int CROP_IMAGE = 123;
 
     private ImageView backImageView;
     private Button finishButton;
@@ -147,14 +155,91 @@ public class AlbumSelectorActivity extends AppCompatActivity implements View.OnC
 
     private OnSingleItemSelectCallback onSingleItemSelectCallback = new OnSingleItemSelectCallback() {
         @Override
-        public void onSingleItemSelect(AlbumFileEntity albumFileEntity) {
+        public void onSingleItemSelect(AlbumFileEntity entity) {
+            //如果是图片切为裁剪模式
+            if (option.isCrop() && MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE == entity.getMediaType()) {
+                cropAlbumFileEntity = entity;
+                cropForPhoto(new File(entity.getPath()));
+            } else {
+                OnAlbumSelectCallback callBack = listenersMap.remove(key);
+                if (callBack != null) {
+                    callBack.onSingleSelect(entity);
+                }
+                onBackPressed();
+
+            }
+        }
+    };
+
+    private AlbumFileEntity cropAlbumFileEntity;
+    private String cropPath;
+
+    private void cropForPhoto(File file) {
+        try {
+            Uri uri = parseUri(file);
+            Intent intent = new Intent("com.android.camera.action.CROP");
+            //添加这一句表示对目标应用临时授权该Uri所代表的文件
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            }
+            intent.setDataAndType(uri, "image/*");
+            //直接裁剪
+            //设置裁剪之后的图片路径文件
+            File cutFile = new File(file.getParent() + File.separator + "crop_" + file.getName());
+            if (cutFile.exists()) {
+                cutFile.delete();
+            }
+            cutFile.createNewFile();
+            cropPath = cutFile.getAbsolutePath();
+
+            //初始化 uri
+            intent.putExtra("crop", true);
+            ImageCropOption imageCropOption = option.getImageCropOption();
+            // aspectX,aspectY 是宽高的比例，这里设置正方形
+            intent.putExtra("aspectX", imageCropOption.getAspectX())
+                    .putExtra("aspectY", imageCropOption.getAspectY());
+            //设置要裁剪的宽高
+            intent.putExtra("outputX", imageCropOption.getOutputX())
+                    .putExtra("outputY", imageCropOption.getOutputY())
+                    .putExtra("scale", imageCropOption.isScale())
+                    .putExtra("outputFormat", imageCropOption.isCircleCrop())
+                    //如果图片过大，会导致oom，这里设置为false
+                    .putExtra("return-data", false);
+
+            Uri outputUri = Uri.fromFile(cutFile);
+            if (outputUri != null) {
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, outputUri);
+            }
+            startActivityForResult(intent, CROP_IMAGE);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        //从裁剪图片回来的
+        if (resultCode == RESULT_OK && requestCode == CROP_IMAGE) {
+            cropAlbumFileEntity.setPath(cropPath);
             OnAlbumSelectCallback callBack = listenersMap.remove(key);
             if (callBack != null) {
-                callBack.onSingleSelect(albumFileEntity);
+                callBack.onSingleSelect(cropAlbumFileEntity);
             }
             onBackPressed();
         }
-    };
+    }
+
+    protected Uri parseUri(File cameraFile) {
+        Uri imageUri;
+        String authority = getPackageName() + ".fileprovider";
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
+            imageUri = FileProvider.getUriForFile(this, authority, cameraFile);
+        } else {
+            imageUri = Uri.fromFile(cameraFile);
+        }
+        return imageUri;
+    }
 
     OnLoadFinishListener onLoadFinishListener = new OnLoadFinishListener() {
         /*表示图片或视频加载完成*/
@@ -212,7 +297,6 @@ public class AlbumSelectorActivity extends AppCompatActivity implements View.OnC
             onBackPressed();
         } else if (v == previewTextView) {
             showPreviewSelectFiles();
-
         } else if (v == resetTextView) {
             gridAdapter.unSelectAll();
         } else if (v == finishButton) {

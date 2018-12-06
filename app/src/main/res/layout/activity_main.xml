@@ -107,10 +107,26 @@
                     android:textSize="16dp"
 
                     />
-
             </RadioGroup>
-
         </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            >
+            <CheckBox
+                android:id="@+id/main_crop_CheckBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16dp"
+                android:textColor="#333"
+                android:text="单选模式是否裁剪"
+                />
+
+
+        </RelativeLayout>
+
+
 
         <TextView
             android:id="@+id/main_select_result_TextView"
