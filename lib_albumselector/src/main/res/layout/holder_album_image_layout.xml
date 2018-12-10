@@ -63,6 +63,18 @@
             android:textSize="8sp" />
     </LinearLayout>
 
+    <ImageView
+        android:id="@+id/holder_album_info_ImageView"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:scaleType="fitCenter"
+        android:padding="3dp"
+        android:src="@drawable/album_ic_info"
+        android:layout_alignBottom="@id/holder_album_ImageView"
+        android:layout_alignRight="@id/holder_album_ImageView"
+        android:layout_margin="5dp"
+        />
+
 
     <!--不可选择用的蒙版-->
     <ImageView

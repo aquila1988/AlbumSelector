@@ -1,5 +1,8 @@
 package com.aquila.lib.album.base;
 
+import android.support.annotation.NonNull;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
 import java.util.ArrayList;
@@ -10,11 +13,62 @@ import java.util.List;
  * @author 作者: yulong
  * @description List的Adapter基类
  */
-public abstract class BaseListAdapter<T> extends BaseAdapter {
+public abstract class BaseListAdapter<T, VH extends BaseViewHolder> extends BaseAdapter {
     protected List<T> dataList;
+    protected int currentPosition = -1;
+
+    public abstract VH onCreateViewHolder(ViewGroup parent, int type);
+
+    public int getViewType(int position) {
+        return position;
+    }
+
+    protected void setCurrentPosition(int currentPosition) {
+        this.currentPosition = currentPosition;
+        notifyDataSetChanged();
+    }
+
+    public int getCurrentPosition() {
+        return currentPosition;
+    }
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        VH holder = null;
+        if (convertView == null) {
+            holder = onCreateViewHolder(parent, getViewType(position));
+            convertView = holder.itemView;
+            convertView.setTag(holder);
+        } else {
+            holder = (VH) convertView.getTag();
+        }
+        onBindHolder(holder, position);
+        return convertView;
+    }
+
+
+    protected void onBindHolder(VH holder, int position){
+        holder.initUIData(getItem(position), position);
+        holder.onSelectPosition(currentPosition == position);
+    }
+
+    @NonNull
+    protected View initHolderAndView(int position, View convertView, ViewGroup parent) {
+        VH holder = null;
+        if (convertView == null) {
+            holder = onCreateViewHolder(parent, getViewType(position));
+            convertView = holder.itemView;
+            convertView.setTag(holder);
+        } else {
+            holder = (VH) convertView.getTag();
+        }
+
+        return convertView;
+    }
 
     /**
      * 设置数据源
+     *
      * @param dataList
      */
     public void setDataList(List<T> dataList) {
@@ -42,8 +96,8 @@ public abstract class BaseListAdapter<T> extends BaseAdapter {
     /**
      * 添加一条数据
      */
-    public void addOneData(T t){
-        if (dataList == null){
+    public void addOneData(T t) {
+        if (dataList == null) {
             dataList = new ArrayList<>();
         }
         dataList.add(t);
@@ -57,7 +111,7 @@ public abstract class BaseListAdapter<T> extends BaseAdapter {
      */
     public boolean deleteItem(T t) {
         boolean flag = false;
-        if (dataList != null){
+        if (dataList != null) {
             flag = dataList.remove(t);
             notifyDataSetChanged();
         }
@@ -69,8 +123,8 @@ public abstract class BaseListAdapter<T> extends BaseAdapter {
      * @param t
      * @return
      */
-    public int getDataPosition(T t){
-        if (dataList == null){
+    public int getDataPosition(T t) {
+        if (dataList == null) {
             return -1;
         }
         return dataList.indexOf(t);
@@ -78,7 +132,6 @@ public abstract class BaseListAdapter<T> extends BaseAdapter {
 
     /**
      * 获取实际数据的个数
-     * @return
      */
     public int getRealCount() {
         if (dataList == null) {

@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import com.aquila.lib.album.base.BaseListAdapter;
 import com.aquila.lib.album.base.BaseViewHolder;
+import com.aquila.lib.album.info.ShowAlbumInfoDialog;
 import com.aquila.lib.album.interfaces.OnNotifySelectCountListener;
 import com.aquila.lib.album.interfaces.OnSingleItemSelectCallback;
 import com.aquila.lib.album.utils.ImageLoadUtil;
@@ -18,7 +19,6 @@ import com.aquila.lib.album.widget.SquaredImageView;
 import com.bumptech.glide.request.RequestOptions;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 /***
@@ -26,15 +26,13 @@ import java.util.List;
  * @author 作者: W.YuLong
  * @description
  */
-public class AlbumGridAdapter extends BaseListAdapter<AlbumFileEntity> {
-    private List<AlbumFileEntity> selectList = new LinkedList<>();
+public class AlbumGridAdapter extends BaseListAdapter<AlbumFileEntity,AlbumGridAdapter.AlbumItemViewHolder> {
+    private List<AlbumFileEntity> selectList = new ArrayList<>();
     private int max = 9;
     private OnNotifySelectCountListener onNotifySelectCountListener;
     private boolean isMultipleSelectMode = false;
 
     private OnSingleItemSelectCallback onSingleItemSelectCallback;
-
-//    private int firstSelectMediaType = 0;
 
     public void setOnSingleItemSelectCallback(OnSingleItemSelectCallback onSingleItemSelectCallback) {
         this.onSingleItemSelectCallback = onSingleItemSelectCallback;
@@ -54,21 +52,16 @@ public class AlbumGridAdapter extends BaseListAdapter<AlbumFileEntity> {
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        AlbumItemViewHolder viewHolder;
-        if (convertView == null) {
-            viewHolder = new AlbumItemViewHolder(parent);
-            convertView = viewHolder.itemView;
-            convertView.setTag(viewHolder);
-        } else {
-            viewHolder = (AlbumItemViewHolder) convertView.getTag();
-        }
+    public AlbumItemViewHolder onCreateViewHolder(ViewGroup parent, int type) {
+        return new AlbumItemViewHolder(parent);
+    }
+
+
+    @Override
+    protected void onBindHolder(AlbumItemViewHolder viewHolder, int position) {
         AlbumFileEntity entity = dataList.get(position);
         viewHolder.initUIData(entity);
-
         viewHolder.setSelectIndexUI(isMultipleSelectMode, selectList.indexOf(entity));
-
-//        viewHolder.setFirstSelectMediaType(firstSelectMediaType);
 
         viewHolder.imageView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
@@ -112,9 +105,8 @@ public class AlbumGridAdapter extends BaseListAdapter<AlbumFileEntity> {
             }
         });
 
-
-        return convertView;
     }
+
 
     /*取消选择*/
     public void unSelectAll() {
@@ -136,7 +128,7 @@ public class AlbumGridAdapter extends BaseListAdapter<AlbumFileEntity> {
      *@author 作者: W.YuLong
      *@description
      */
-    public static class AlbumItemViewHolder extends BaseViewHolder {
+    public static class AlbumItemViewHolder extends BaseViewHolder implements View.OnClickListener{
 
         private SquaredImageView imageView;
         private ImageView checkImageView;
@@ -144,14 +136,21 @@ public class AlbumGridAdapter extends BaseListAdapter<AlbumFileEntity> {
         private TextView videoDurationTextView;
         private TextView indexTextView;
         private ImageView maskView;
+        private ImageView infoImageView;
 
         private AlbumFileEntity entity;
 
         public AlbumItemViewHolder(ViewGroup viewGroup) {
             super(viewGroup, R.layout.holder_album_image_layout);
 
+            initViewFromXML();
+            infoImageView.setOnClickListener(this);
+        }
+
+        private void initViewFromXML() {
             imageView = itemView.findViewById(R.id.holder_album_ImageView);
             checkImageView = itemView.findViewById(R.id.holder_album_check_ImageView);
+            infoImageView= itemView.findViewById(R.id.holder_album_info_ImageView);
             videoTypeLayout = itemView.findViewById(R.id.holder_album_video_info_layout);
             videoDurationTextView = itemView.findViewById(R.id.holder_album_video_duration_TextView);
             indexTextView = itemView.findViewById(R.id.holder_album_index_TextView);
@@ -179,7 +178,6 @@ public class AlbumGridAdapter extends BaseListAdapter<AlbumFileEntity> {
                 if (isMultipleMode) {
                     checkImageView.setVisibility(View.VISIBLE);
                 }
-
             }
         }
 
@@ -202,6 +200,7 @@ public class AlbumGridAdapter extends BaseListAdapter<AlbumFileEntity> {
                     .error(R.drawable.album_ic_default);
 
             ImageLoadUtil.loadImageWithOption(imageView, entity.getPath(), options);
+            ImageLoadUtil.loadImage(infoImageView, R.drawable.album_ic_info);
 
             if (entity.getMediaType() == MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO) {
                 videoTypeLayout.setVisibility(View.VISIBLE);
@@ -226,6 +225,17 @@ public class AlbumGridAdapter extends BaseListAdapter<AlbumFileEntity> {
             }
 
             return result;
+
+        }
+
+        @Override
+        public void onClick(View v) {
+            if (v == infoImageView){
+                Toast.makeText(v.getContext(),"点击图片信息", Toast.LENGTH_SHORT).show();
+                ShowAlbumInfoDialog albumInfoDialog = new ShowAlbumInfoDialog(v.getContext());
+                albumInfoDialog.showDialogInfo(entity);
+
+            }
 
         }
     }

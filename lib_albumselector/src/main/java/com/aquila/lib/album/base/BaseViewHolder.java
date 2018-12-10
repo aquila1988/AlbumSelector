@@ -2,7 +2,6 @@ package com.aquila.lib.album.base;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
 /***
@@ -15,10 +14,6 @@ public abstract class BaseViewHolder extends RecyclerView.ViewHolder {
 
     public BaseViewHolder(ViewGroup viewGroup, int layoutId) {
         super(LayoutInflater.from(viewGroup.getContext()).inflate(layoutId, viewGroup, false));
-    }
-
-    public BaseViewHolder(View itemView) {
-        super(itemView);
     }
 
     public <T> void initUIData(T t, int position){
